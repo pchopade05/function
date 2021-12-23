@@ -1,0 +1,19 @@
+select serial_no,scanner_id,actual_ts,session_id,last_count(scanner_id,session_id),todays_count(scanner_id),total_count(scanner_id) from traffic_result WHERE serial_no <> '0' GROUP BY serial_no,scanner_id ORDER BY actual_ts DESC LIMIT 4;
+
+SELECT COUNT(*) FROM traffic_result WHERE scanner_id = '' AND session_id = '' 
+
+DELIMITER $$
+
+CREATE FUNCTION last_count(
+	scanner_id_v INT,
+	session_id_v INT
+) 
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE last_count_val INT DEFAULT 0;
+	SET last_count_val = (SELECT COUNT(*) FROM traffic_result WHERE scanner_id = scanner_id_v AND session_id = session_id_v);
+	-- return the customer level
+	RETURN (last_count_val);
+END$$
+DELIMITER ;
